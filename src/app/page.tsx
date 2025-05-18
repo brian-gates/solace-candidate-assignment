@@ -1,4 +1,4 @@
-import AdvocateBrowse from "./AdvocateBrowse";
+import AdvocateBrowse from "./advocate-browse";
 
 const badgeColors = [
   "bg-green-100 text-green-800 border-green-200",
