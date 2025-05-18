@@ -11,5 +11,5 @@ export async function GET() {
     Array.isArray(row.specialties) ? row.specialties : []
   );
   const unique = Array.from(new Set(all)).sort();
-  return Response.json({ skills: unique });
+  return Response.json({ specialties: unique });
 }
