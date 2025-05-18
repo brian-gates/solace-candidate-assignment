@@ -1,18 +1,10 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { AdvocateCard } from "@/components/ui/advocate-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Advocate = {
   firstName: string;
@@ -44,7 +36,7 @@ const badgeColors = [
 /**
  * Get a deterministic color for a given string.
  */
-function getDeterministicColor(text: string) {
+export function getDeterministicColor(text: string) {
   const hash = Array.from(text).reduce(
     (acc, char) => char.charCodeAt(0) + ((acc << 5) - acc),
     0
@@ -56,23 +48,48 @@ function getDeterministicColor(text: string) {
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
   const [filteredAdvocates, setFilteredAdvocates] = useState<Advocate[]>([]);
+  const [total, setTotal] = useState<number>(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const limit = 10;
+  const tableRef = useRef<HTMLDivElement>(null);
+  const hasMore = advocates.length < total;
+
+  const fetchAdvocates = useCallback(async (pageNum: number) => {
+    setLoading(true);
+    const offset = (pageNum - 1) * limit;
+    const res = await fetch(`/api/advocates?limit=${limit}&offset=${offset}`);
+    const json = await res.json();
+    setAdvocates((prev) => [...prev, ...json.data]);
+    setFilteredAdvocates((prev) => [...prev, ...json.data]);
+    setTotal(json.total ?? json.data.length);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    console.log("fetching advocates...");
-    fetch("/api/advocates").then((response) => {
-      response.json().then((jsonResponse) => {
-        setAdvocates(jsonResponse.data);
-        setFilteredAdvocates(jsonResponse.data);
-      });
-    });
-  }, []);
+    fetchAdvocates(page);
+  }, [page, fetchAdvocates]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loading || !hasMore) return;
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 100
+      ) {
+        setPage((p) => (hasMore ? p + 1 : p));
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loading, hasMore]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value;
     const searchTermSpan = document.getElementById("search-term");
     if (searchTermSpan) searchTermSpan.innerHTML = searchTerm;
     const searchTermLower = searchTerm.toLowerCase();
-    const filteredAdvocates = advocates.filter((advocate) => {
+    const filtered = advocates.filter((advocate) => {
       return (
         advocate.firstName.toLowerCase().includes(searchTermLower) ||
         advocate.lastName.toLowerCase().includes(searchTermLower) ||
@@ -85,7 +102,7 @@ export default function Home() {
         advocate.yearsOfExperience.toString().includes(searchTermLower)
       );
     });
-    setFilteredAdvocates(filteredAdvocates);
+    setFilteredAdvocates(filtered);
   };
 
   const onClick = () => {
@@ -115,49 +132,28 @@ export default function Home() {
               Reset Search
             </Button>
           </div>
-          <div className="mb-4 text-sm text-muted-foreground text-center">
-            Searching for:{" "}
-            <span id="search-term" className="font-medium text-primary"></span>
+          <div className="mb-2 text-sm text-muted-foreground text-center">
+            Showing {filteredAdvocates.length} of {total} total results
           </div>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>First Name</TableHead>
-                  <TableHead>Last Name</TableHead>
-                  <TableHead>City</TableHead>
-                  <TableHead>Degree</TableHead>
-                  <TableHead>Specialties</TableHead>
-                  <TableHead>Years of Experience</TableHead>
-                  <TableHead>Phone Number</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAdvocates.map((advocate, i) => (
-                  <TableRow key={advocate.phoneNumber + i}>
-                    <TableCell>{advocate.firstName}</TableCell>
-                    <TableCell>{advocate.lastName}</TableCell>
-                    <TableCell>{advocate.city}</TableCell>
-                    <TableCell>{advocate.degree}</TableCell>
-                    <TableCell>
-                      {advocate.specialties.map((s, j) => (
-                        <Badge
-                          key={s + j}
-                          className={`mr-1 mb-1 inline-block border transition-colors duration-150
-                            ${getDeterministicColor(s)}
-                            hover:bg-black/80 hover:text-white hover:border-black/80
-                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
-                        >
-                          {s}
-                        </Badge>
-                      ))}
-                    </TableCell>
-                    <TableCell>{advocate.yearsOfExperience}</TableCell>
-                    <TableCell>{advocate.phoneNumber}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div ref={tableRef}>
+            <div className="flex flex-col gap-4">
+              {filteredAdvocates.map((advocate, i) => (
+                <AdvocateCard
+                  key={advocate.phoneNumber + i}
+                  advocate={advocate}
+                />
+              ))}
+            </div>
+            {loading && (
+              <div className="text-center py-4 text-muted-foreground">
+                Loading...
+              </div>
+            )}
+            {!hasMore && (
+              <div className="text-center py-4 text-muted-foreground">
+                End of results.
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
