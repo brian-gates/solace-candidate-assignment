@@ -49,5 +49,5 @@ npx drizzle-kit push
 4. Seed the database
 
 ```bash
-curl -X POST http://localhost:3000/api/seed
+curl -X POST http://localhost:3003/api/seed
 ```

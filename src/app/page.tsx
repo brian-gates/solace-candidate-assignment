@@ -6,7 +6,7 @@ async function fetchInitialAdvocates(search: string) {
   const res = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL
       ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/advocates?${params.toString()}`
-      : `http://localhost:3000/api/advocates?${params.toString()}`,
+      : `http://localhost:3003/api/advocates?${params.toString()}`,
     { cache: "no-store" }
   );
   return res.json();
