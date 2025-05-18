@@ -4,6 +4,16 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js 18.18.0 (LTS)
+- npm 9.8.1 or later
+
+If you use nvm, you can automatically switch to the correct Node.js version:
+```bash
+nvm use
+```
+
 Install dependencies
 
 ```bash
