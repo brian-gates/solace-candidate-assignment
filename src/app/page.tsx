@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,35 @@ type Advocate = {
   yearsOfExperience: number;
   phoneNumber: number;
 };
+
+const badgeColors = [
+  "bg-green-100 text-green-800 border-green-200",
+  "bg-blue-100 text-blue-800 border-blue-200",
+  "bg-purple-100 text-purple-800 border-purple-200",
+  "bg-yellow-100 text-yellow-800 border-yellow-200",
+  "bg-pink-100 text-pink-800 border-pink-200",
+  "bg-orange-100 text-orange-800 border-orange-200",
+  "bg-red-100 text-red-800 border-red-200",
+  "bg-cyan-100 text-cyan-800 border-cyan-200",
+  "bg-teal-100 text-teal-800 border-teal-200",
+  "bg-indigo-100 text-indigo-800 border-indigo-200",
+  "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
+  "bg-lime-100 text-lime-800 border-lime-200",
+  "bg-amber-100 text-amber-800 border-amber-200",
+  "bg-rose-100 text-rose-800 border-rose-200",
+];
+
+/**
+ * Get a deterministic color for a given string.
+ */
+function getDeterministicColor(text: string) {
+  const hash = Array.from(text).reduce(
+    (acc, char) => char.charCodeAt(0) + ((acc << 5) - acc),
+    0
+  );
+  const idx = Math.abs(hash) % badgeColors.length;
+  return badgeColors[idx];
+}
 
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
@@ -111,7 +141,15 @@ export default function Home() {
                     <TableCell>{advocate.degree}</TableCell>
                     <TableCell>
                       {advocate.specialties.map((s, j) => (
-                        <div key={s + j}>{s}</div>
+                        <Badge
+                          key={s + j}
+                          className={`mr-1 mb-1 inline-block border transition-colors duration-150
+                            ${getDeterministicColor(s)}
+                            hover:bg-black/80 hover:text-white hover:border-black/80
+                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
+                        >
+                          {s}
+                        </Badge>
                       ))}
                     </TableCell>
                     <TableCell>{advocate.yearsOfExperience}</TableCell>
