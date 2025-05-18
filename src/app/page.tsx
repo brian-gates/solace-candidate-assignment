@@ -30,14 +30,18 @@ export default function Home() {
     const searchTerm = e.target.value;
     const searchTermSpan = document.getElementById("search-term");
     if (searchTermSpan) searchTermSpan.innerHTML = searchTerm;
+    const searchTermLower = searchTerm.toLowerCase();
     const filteredAdvocates = advocates.filter((advocate) => {
       return (
-        advocate.firstName.includes(searchTerm) ||
-        advocate.lastName.includes(searchTerm) ||
-        advocate.city.includes(searchTerm) ||
-        advocate.degree.includes(searchTerm) ||
-        advocate.specialties.join(",").includes(searchTerm) ||
-        advocate.yearsOfExperience.toString().includes(searchTerm)
+        advocate.firstName.toLowerCase().includes(searchTermLower) ||
+        advocate.lastName.toLowerCase().includes(searchTermLower) ||
+        advocate.city.toLowerCase().includes(searchTermLower) ||
+        advocate.degree.toLowerCase().includes(searchTermLower) ||
+        advocate.specialties
+          .join(",")
+          .toLowerCase()
+          .includes(searchTermLower) ||
+        advocate.yearsOfExperience.toString().includes(searchTermLower)
       );
     });
     setFilteredAdvocates(filteredAdvocates);
