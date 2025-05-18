@@ -43,3 +43,4 @@
 - Add unit and integration tests for API and UI
 - Further improve accessibility (a11y)
 - Remove any remaining client-side state that could be handled by server actions or form mutations
+- Debounce user input in search field to prevent unnecessary API calls / mitigate race conditions
