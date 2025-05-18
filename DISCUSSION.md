@@ -35,7 +35,7 @@
 
 # Potential Improvements
 
-- Refactor specialties to their own table with IDs and better indexing ([PR 12: spedialties wip](https://github.com/brian-gates/solace-candidate-assignment/pull/12))
+- Refactor specialties to their own table with IDs and better indexing ([PR 12: specialties wip](https://github.com/brian-gates/solace-candidate-assignment/pull/12))
 - Add filtering by specialty, city, or other fields
 - Add advocate detail pages with more information and clickable links
 - Add sorting options (e.g., by experience, name)
