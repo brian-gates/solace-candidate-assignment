@@ -5,8 +5,10 @@ async function fetchInitialAdvocates(search: string) {
   if (search) params.set("search", search);
   const res = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL
-      ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/advocates?${params.toString()}`
-      : `http://localhost:3003/api/advocates?${params.toString()}`,
+      ? `${
+          process.env.NEXT_PUBLIC_BASE_URL
+        }/solace/api/advocates?${params.toString()}`
+      : `http://localhost:3003/solace/api/advocates?${params.toString()}`,
     { cache: "no-store" }
   );
   return res.json();

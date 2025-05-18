@@ -45,7 +45,7 @@ export default function AdvocateBrowse({
         offset: String(offset),
       });
       if (search) params.set("search", search);
-      const res = await fetch(`/api/advocates?${params.toString()}`);
+      const res = await fetch(`/solace/api/advocates?${params.toString()}`);
       const json = await res.json();
       setAdvocates((prev) =>
         pageNum === 1 ? json.data : [...prev, ...json.data]

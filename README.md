@@ -2,6 +2,8 @@
 
 See [DISCUSSION.md](DISCUSSION.md) for a summary of the features implemented and potential improvements.
 
+Live demo: http://briangates.me/solace/
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
