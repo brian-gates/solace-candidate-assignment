@@ -1,0 +1,1 @@
+- Future improvement: Refactor specialties to its own table with IDs and better indexing for performance and normalization. This would allow for more efficient queries, easier updates, and improved data integrity.

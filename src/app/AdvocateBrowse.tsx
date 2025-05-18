@@ -3,6 +3,7 @@ import { AdvocateCard } from "@/components/ui/advocate-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import SpecialtyPicker from "@/components/ui/specialty-picker";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -19,9 +20,13 @@ type Advocate = {
 export default function AdvocateBrowse({
   initialData,
   initialSearch,
+  initialSpecialties,
+  initialSelectedSpecialties,
 }: {
   initialData: { data: Advocate[]; total: number };
   initialSearch: string;
+  initialSpecialties: string[];
+  initialSelectedSpecialties: string[];
 }) {
   const [advocates, setAdvocates] = useState<Advocate[]>(initialData.data);
   const [total, setTotal] = useState<number>(
@@ -30,13 +35,17 @@ export default function AdvocateBrowse({
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [specialties, setSpecialties] = useState<string[]>(initialSpecialties);
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>(
+    initialSelectedSpecialties
+  );
   const limit = 10;
   const hasMore = advocates.length < total;
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const fetchAdvocates = useCallback(
-    async (pageNum: number, search: string) => {
+    async (pageNum: number, search: string, specialties: string[]) => {
       setLoading(true);
       const offset = (pageNum - 1) * limit;
       const params = new URLSearchParams({
@@ -44,6 +53,7 @@ export default function AdvocateBrowse({
         offset: String(offset),
       });
       if (search) params.set("search", search);
+      if (specialties.length) params.set("specialties", specialties.join(","));
       const res = await fetch(`/api/advocates?${params.toString()}`);
       const json = await res.json();
       setAdvocates((prev) =>
@@ -56,16 +66,16 @@ export default function AdvocateBrowse({
   );
 
   useEffect(() => {
-    fetchAdvocates(page, searchTerm);
-  }, [page, fetchAdvocates, searchTerm]);
+    fetchAdvocates(page, searchTerm, selectedSpecialties);
+  }, [page, fetchAdvocates, searchTerm, selectedSpecialties]);
 
   useEffect(() => {
     setPage(1);
     const handler = setTimeout(() => {
-      fetchAdvocates(1, searchTerm);
+      fetchAdvocates(1, searchTerm, selectedSpecialties);
     }, 300);
     return () => clearTimeout(handler);
-  }, [searchTerm, fetchAdvocates]);
+  }, [searchTerm, selectedSpecialties, fetchAdvocates]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,6 +99,8 @@ export default function AdvocateBrowse({
     } else {
       params.delete("search");
     }
+    if (selectedSpecialties.length)
+      params.set("specialties", selectedSpecialties.join(","));
     router.replace(`/?${params.toString()}`);
     const searchTermSpan = document.getElementById("search-term");
     if (searchTermSpan) searchTermSpan.innerHTML = e.target.value;
@@ -98,6 +110,20 @@ export default function AdvocateBrowse({
     setSearchTerm("");
     const params = new URLSearchParams(searchParams.toString());
     params.delete("search");
+    if (selectedSpecialties.length)
+      params.set("specialties", selectedSpecialties.join(","));
+    router.replace(`/?${params.toString()}`);
+  };
+
+  const onSpecialtyToggle = (specialty: string) => {
+    const next = selectedSpecialties.includes(specialty)
+      ? selectedSpecialties.filter((s) => s !== specialty)
+      : [...selectedSpecialties, specialty];
+    setSelectedSpecialties(next);
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchTerm) params.set("search", searchTerm);
+    if (next.length) params.set("specialties", next.join(","));
+    else params.delete("specialties");
     router.replace(`/?${params.toString()}`);
   };
 
@@ -108,6 +134,11 @@ export default function AdvocateBrowse({
           <h1 className="text-4xl font-bold my-6 text-center">
             Solace Advocates
           </h1>
+          <SpecialtyPicker
+            specialties={specialties}
+            selectedSpecialties={selectedSpecialties}
+            onChange={onSpecialtyToggle}
+          />
           <div className="flex flex-col md:flex-row items-center gap-4 mb-8">
             <div className="flex-1 w-full">
               <Input

@@ -1,6 +1,6 @@
-import { getDeterministicColor } from "@/app/page";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { getDeterministicColor } from "@/lib/get-deterministic-color";
 
 export function AdvocateCard({
   advocate,
