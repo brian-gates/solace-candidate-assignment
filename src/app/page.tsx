@@ -1,8 +1,9 @@
 import AdvocateBrowse from "./advocate-browse";
 
-async function fetchInitialAdvocates(search: string) {
+async function fetchInitialAdvocates(search: string, sort: string) {
   const params = new URLSearchParams({ limit: "10", offset: "0" });
   if (search) params.set("search", search);
+  if (sort) params.set("sort", sort);
   const res = await fetch(
     process.env.NEXT_PUBLIC_BASE_URL
       ? `${
@@ -17,11 +18,16 @@ async function fetchInitialAdvocates(search: string) {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { search?: string };
+  searchParams: { search?: string; sort?: string };
 }) {
   const initialSearch = searchParams?.search ?? "";
-  const initialData = await fetchInitialAdvocates(initialSearch);
+  const initialSort = searchParams?.sort ?? "firstName-asc";
+  const initialData = await fetchInitialAdvocates(initialSearch, initialSort);
   return (
-    <AdvocateBrowse initialData={initialData} initialSearch={initialSearch} />
+    <AdvocateBrowse
+      initialData={initialData}
+      initialSearch={initialSearch}
+      initialSort={initialSort}
+    />
   );
 }
